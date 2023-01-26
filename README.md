@@ -17,3 +17,11 @@ The files `templace.cpp`, `template.h`, `surface.cpp` and `surface.h` are adapte
 ## References/Credits
 
 The use of pre-existing code (apart from the changes mentioned above) is always denoted by a comment and a reference to its source. The assets have their licences or readme's included.
+
+## Building
+
+The game should build fine on Windows using Visual Studio.
+
+On Linux, a library or two might need to be installed first. Then, simply run `make whack-a-window`. The resulting binary should be located in the `bin/` directory.
+
+If any text is rendered incorrectly, if the game complains about missing files or if a segfault occurs try executing `assets/converted_font/convert.py` from the base directory. The game itself should also be run from the base directory.

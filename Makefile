@@ -10,7 +10,7 @@ MUTE = writable-strings uninitialized
 CXXFLAGS = -Wall $(addprefix -Wno-,$(MUTE)) -I/usr/include/SDL2 -I/usr/include/GL -g
 LDFLAGS = -lSDL2_test -lSDL2main -lSDL2 -lfreeimage -lGL
 
-APPNAME = game
+APPNAME = whack-a-window
 EXT = .cpp
 SRCDIR = src
 HEADERDIR = src
@@ -33,6 +33,7 @@ OBJCOUNT = $(foreach v,$(OBJCOUNT_NOPAD),$(shell printf '%02d' $(v)))
 .DEFAULT_GOAL := $(APP)
 
 # Builds the app
+$(APPNAME): $(APP)
 $(APP): $(OBJ) | makedirs
 	@printf "[final] compiling final product $(notdir $@)..."
 	@$(CC) $(CXXFLAGS) -I$(HEADERDIR)/$(TARGET) -o $@ $^ $(LDFLAGS)
