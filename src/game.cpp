@@ -1,6 +1,6 @@
 #include <ctime>
-#include <SDL2/SDL_scancode.h>
-#include <SDL2/SDL.h>
+#include <SDL_scancode.h>
+#include <SDL.h>
 #include "surface.h"
 #include "text.h"
 #include "game.h"
@@ -9,7 +9,7 @@
 namespace Tmpl8 {
 
 #define BG_ASSET "assets/RollingBall/background_green.png"
-#define BG_TILE_SIZE 50
+#define BG_TILE_SIZE 50		
 #define TEXT_SCALE 4
 
 #define BALL_VEL_SCALE 0.2

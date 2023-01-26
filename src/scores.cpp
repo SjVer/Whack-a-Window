@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <bits/stdc++.h>
+#include <algorithm>
 
 #define SCORES_FILE "scores.bin"
 

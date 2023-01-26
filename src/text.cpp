@@ -1,5 +1,5 @@
 #include "text.h"
-#include <cstdlib>
+#include <cstdarg>
 
 namespace Tmpl8 {
 

@@ -32,7 +32,11 @@ extern "C"
 #include "glew.h" 
 }
 #include "gl.h"
+#ifdef WINDOWS
+#include "wglext.h"
+#else
 #include "glext.h"
+#endif
 #endif
 
 namespace Tmpl8 { 
@@ -194,6 +198,7 @@ vec2 GetRealWindowPos() {
 	return vec2(x, y);
 }
 
+#undef _MSC_VER
 #ifdef _MSC_VER
 bool redirectIO()
 {

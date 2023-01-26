@@ -8,6 +8,10 @@
 #pragma comment(linker, "/manifestdependency:\"name='dlls_x64' version='1.0.0.0' type='x64'\"")
 #endif
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+#define WINDOWS
+#endif
+
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
@@ -29,6 +33,10 @@ inline int IRand( int range ) { return rand() % range; }
 inline bool RandBool() { return rand() > (RAND_MAX / 2); }
 int filesize( FILE* f );
 
+#ifdef WINDOWS
+#define MALLOC64(x) _aligned_malloc(x,64)
+#define FREE64(x) _aligned_free(x)
+#else
 // see https://9to5answer.com/aligned-malloc-in-c
 inline void *aligned_malloc(size_t required_bytes, size_t alignment) {
     void *p1;
@@ -48,11 +56,17 @@ inline void aligned_free( void* p ) {
 
 #define MALLOC64(x) aligned_malloc(x, 64)
 #define FREE64(x) aligned_free(x)
+#endif
 
 typedef unsigned char uchar;
 typedef unsigned char byte;
+#ifdef WINDOWS
+typedef __int64 int64;
+typedef unsigned __int64 uint64;
+#else
 typedef __int64_t int64;
 typedef __uint64_t uint64;
+#endif
 typedef unsigned int uint;
 
 namespace Tmpl8 {
