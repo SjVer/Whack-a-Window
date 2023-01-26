@@ -12,7 +12,7 @@ Control the bouncing ball by dragging the window around. The ball will bounce of
 
 ## Additional information
 
-The files `templace.cpp`, `template.h`, `surface.cpp` and `surface.h` are adapted from the given template and are left mostly untouched. The `template` files have been slightly edited for both additional game functionality and Linux compatibility (Linux was used during development. The file `surface.cpp` has as only change a few extra lines in the function `Sprite::DrawScaled`. For explanation see the implementation of said function.
+The files `templace.cpp`, `template.h`, `surface.cpp` and `surface.h` are adapted from the given template and are left mostly untouched. The `template` files have been slightly edited for both additional game functionality and Linux compatibility (as Linux was used during development). The file `surface.cpp` has as only a few extra lines in the function `Sprite::DrawScaled`. For explanation see the implementation of said function.
 
 ## References/Credits
 
