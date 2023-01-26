@@ -1,4 +1,5 @@
-# Adapted from https://stackoverflow.com/a/67068237/16166019
+# adapted from https://stackoverflow.com/a/67068237/16166019
+# renders the given characters to seperate images using a font
 
 from PIL import Image, ImageFont, ImageDraw
 
