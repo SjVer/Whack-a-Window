@@ -27,7 +27,7 @@ char nameBuff[10] = "";
 Scores top3 = Scores();
 
 Game::Game(Surface* screen): screen(screen) {
-	Reset(STATE_ENDMENU);
+	Reset(STATE_STARTMENU);
 }
 
 void Game::Reset(int newState) {
