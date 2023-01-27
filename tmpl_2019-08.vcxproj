@@ -81,9 +81,10 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)\bin\</OutDir>
+    <OutDir>$(SolutionDir)\</OutDir>
     <IntDir>bin\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_x64_debug</TargetName>
+    <CopyCppRuntimeToOutputDir>false</CopyCppRuntimeToOutputDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>$(ProjectName)_x86_debug</TargetName>
@@ -123,7 +124,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>lib;lib\OpenGL;lib\SDL2-2.0.10\include;lib\freeimage\inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>win\lib;win\lib\OpenGL;win\lib\SDL2-2.0.10\include;win\lib\freeimage\inc</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -139,7 +140,7 @@
     <Link>
       <AdditionalDependencies>winmm.lib;advapi32.lib;user32.lib;sdl2.lib;sdl2main.lib;opengl32.lib;freeimage.lib</AdditionalDependencies>
       <OutputFile>$(TargetPath)</OutputFile>
-      <AdditionalLibraryDirectories>lib\SDL2-2.0.10\lib\x64;lib\freeimage\lib64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>win\lib\SDL2-2.0.10\lib\x64;win\lib\freeimage\lib64</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>msvcrt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -147,6 +148,9 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
     </Link>
+    <ProjectReference>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -222,21 +226,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="entities.cpp" />
-    <ClCompile Include="game.cpp" />
-    <ClCompile Include="scores.cpp" />
-    <ClCompile Include="surface.cpp" />
-    <ClCompile Include="template.cpp" />
-    <ClCompile Include="text.cpp" />
+    <ClCompile Include="src\entities.cpp" />
+    <ClCompile Include="src\game.cpp" />
+    <ClCompile Include="src\scores.cpp" />
+    <ClCompile Include="src\surface.cpp" />
+    <ClCompile Include="src\template.cpp" />
+    <ClCompile Include="src\text.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="collision.h" />
-    <ClInclude Include="entities.h" />
-    <ClInclude Include="game.h" />
-    <ClInclude Include="scores.h" />
-    <ClInclude Include="surface.h" />
-    <ClInclude Include="template.h" />
-    <ClInclude Include="text.h" />
+    <ClInclude Include="src\collision.h" />
+    <ClInclude Include="src\entities.h" />
+    <ClInclude Include="src\game.h" />
+    <ClInclude Include="src\scores.h" />
+    <ClInclude Include="src\surface.h" />
+    <ClInclude Include="src\template.h" />
+    <ClInclude Include="src\text.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="clean.bat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
