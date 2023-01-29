@@ -151,7 +151,7 @@
       <AdditionalLibraryDirectories>win\lib\SDL2-2.0.10\lib\x64;win\lib\freeimage\lib64</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>msvcrt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -265,6 +265,9 @@
     <CopyFileToFolders Include="win\dlls_x64\FreeImage.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
+    <None Include=".gitignore" />
+    <None Include="Makefile" />
+    <None Include="README.md" />
     <None Include="win\dlls_x86\FreeImage.dll" />
     <None Include="win\dlls_x86\SDL2.dll" />
   </ItemGroup>

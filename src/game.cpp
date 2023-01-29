@@ -209,6 +209,8 @@ void Game::TickScoreMenu() {
 }
 
 void Game::Tick(float deltaTime) {
+	_ASSERTE(screen->GetBuffer());
+
 	switch (state) {
 		case STATE_STARTMENU:
 			TickStartMenu();

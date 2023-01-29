@@ -20,7 +20,7 @@ The use of pre-existing code (apart from the changes mentioned above) is always 
 
 ## Building
 
-The game should build fine on Windows using Visual Studio.
+The game should build fine on Windows using Visual Studio. The resulting executable should be located in the `bin/` directory.
 
 On Linux, a library or two might need to be installed first. Then, simply run `make whack-a-window`. The resulting binary should be located in the `bin/` directory.
 

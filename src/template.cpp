@@ -198,36 +198,6 @@ vec2 GetRealWindowPos() {
 	return vec2(x, y);
 }
 
-#undef _MSC_VER
-#ifdef _MSC_VER
-bool redirectIO()
-{
-	CONSOLE_SCREEN_BUFFER_INFO coninfo;
-	AllocConsole();
-	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &coninfo);
-	coninfo.dwSize.Y = 500;
-	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), coninfo.dwSize);
-	HANDLE h1 = GetStdHandle(STD_OUTPUT_HANDLE);
-	int h2 = _open_osfhandle((intptr_t)h1, _O_TEXT);
-	FILE* fp = _fdopen(h2, "w");
-	*stdout = *fp;
-	setvbuf(stdout, NULL, _IONBF, 0);
-	h1 = GetStdHandle(STD_INPUT_HANDLE), h2 = _open_osfhandle((intptr_t)h1, _O_TEXT);
-	fp = _fdopen(h2, "r"), * stdin = *fp;
-	setvbuf(stdin, NULL, _IONBF, 0);
-	h1 = GetStdHandle(STD_ERROR_HANDLE), h2 = _open_osfhandle((intptr_t)h1, _O_TEXT);
-	fp = _fdopen(h2, "w"), * stderr = *fp;
-	setvbuf(stderr, NULL, _IONBF, 0);
-	ios::sync_with_stdio();
-	FILE* stream;
-	if ((stream = freopen("CON", "w", stdout)) == NULL)
-		return false;
-	if ((stream = freopen("CON", "w", stderr)) == NULL)
-		return false;
-	return true;
-}
-#endif
-
 #ifdef ADVANCEDGL
 
 bool createFBtexture()
@@ -255,7 +225,6 @@ bool createFBtexture()
 	glBindTexture(GL_TEXTURE_2D, framebufferTexID[0]);
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, fbPBO[0]);
 	framedata = (unsigned char*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY_ARB);
-	if (!framedata) return false;
 	memset(framedata, 0, ScreenWidth * ScreenHeight * 4);
 	return (glGetError() == 0);
 }
@@ -300,6 +269,7 @@ void swap()
 	nextindex = (index + 1) % 2;
 	index = (index + 1) % 2;
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, fbPBO[nextindex]);
+	// TODO: glMapBuffer returns NULL??
 	framedata = (unsigned char*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY_ARB);
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glBegin(GL_QUADS);
@@ -323,54 +293,10 @@ SDL_HitTestResult hitTestCallback(SDL_Window*, const SDL_Point*, void* game) {
 	return SDL_HITTEST_DRAGGABLE;
 }
 
-int main(int argc, char** argv)
-{
-	SDL_SetHintWithPriority(SDL_HINT_RENDER_VSYNC, "0", SDL_HINT_OVERRIDE);
-#ifdef _MSC_VER
-	if (!redirectIO())
-		return 1;
-#endif
-	printf("application started.\n");
-	SDL_Init(SDL_INIT_VIDEO);
-#ifdef ADVANCEDGL
-#ifdef FULLSCREEN
-	window = SDL_CreateWindow(WindowName, 50, 50, ScreenWidth, ScreenHeight, SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL);
-#else
-	window = SDL_CreateWindow(
-		WindowName,
-		SDL_WINDOWPOS_CENTERED,
-		SDL_WINDOWPOS_CENTERED,
-		ScreenWidth, ScreenHeight,
-		SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL
-	);
-#endif
-	SDL_GLContext glContext = SDL_GL_CreateContext(window);
-	SDL_SetWindowHitTest(window, hitTestCallback, NULL);
-	init();
-	// SDL_ShowCursor(false);
-#else
-#ifdef FULLSCREEN
-	window = SDL_CreateWindow(WindowName, 100, 100, ScreenWidth, ScreenHeight, SDL_WINDOW_FULLSCREEN);
-#else
-	window = SDL_CreateWindow(WindowName, 100, 100, ScreenWidth, ScreenHeight, SDL_WINDOW_SHOWN);
-#endif
-	surface = new Surface(ScreenWidth, ScreenHeight);
-	surface->Clear(0);
-	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	SDL_Texture* frameBuffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, ScreenWidth, ScreenHeight);
-#endif
-
-	// get monitor size
-	SDL_DisplayMode dm;
-	SDL_GetCurrentDisplayMode(0, &dm);
-	monitorSize = vec2(dm.w, dm.h);
-
-	int exitapp = 0;
-	game = new Game(surface);
+int gameLoop(void*) {
 	timer t;
 	t.reset();
-	oldWindowPos = GetRealWindowPos();
-	while (!exitapp)
+	while (game->state != Game::STATE_EXIT)
 	{
 #ifdef ADVANCEDGL
 		swap();
@@ -400,51 +326,101 @@ int main(int argc, char** argv)
 		// calculate frame time and pass it to game->Tick
 		float elapsedTime = t.elapsed();
 		t.reset();
-
 		game->Tick(elapsedTime);
-		// event loop
-		SDL_Event event;
-		while (SDL_PollEvent(&event))
+	}
+
+	return 0;
+}
+
+void eventLoop() {
+	SDL_Event event;
+	while (SDL_PollEvent(&event))
+	{
+		switch (event.type)
 		{
-			switch (event.type)
-			{
-			case SDL_QUIT:
-				exitapp = 1;
-				break;
-			case SDL_KEYDOWN:
-				game->KeyDown(event.key.keysym.scancode);
-				break;
-			case SDL_KEYUP:
-				game->KeyUp(event.key.keysym.scancode);
-				break;
-			case SDL_MOUSEMOTION: {
-				vec2 pos(event.motion.x, event.motion.y);
-				game->MouseMove(pos);
-				game->mousePos = pos;
-				break;
-			}
-			case SDL_MOUSEBUTTONUP:
-				game->MouseUp(event.button.button);
-				break;
-			case SDL_MOUSEBUTTONDOWN:
-				game->MouseDown(event.button.button);
-				break;
+		case SDL_QUIT:
+			game->state = Game::STATE_EXIT;
+			break;
+		case SDL_KEYDOWN:
+			game->KeyDown(event.key.keysym.scancode);
+			break;
+		case SDL_KEYUP:
+			game->KeyUp(event.key.keysym.scancode);
+			break;
+		case SDL_MOUSEMOTION: {
+			vec2 pos(event.motion.x, event.motion.y);
+			game->MouseMove(pos);
+			game->mousePos = pos;
+			break;
+		}
+		case SDL_MOUSEBUTTONUP:
+			game->MouseUp(event.button.button);
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			game->MouseDown(event.button.button);
+			break;
 
-			case SDL_WINDOWEVENT: {
-				if (event.window.event == SDL_WINDOWEVENT_MOVED) {
-					vec2 new_pos = GetRealWindowPos();
-					game->WindowMove(new_pos);
-					oldWindowPos = new_pos;
-				}
-			}
-
-			default:
-				break;
+		case SDL_WINDOWEVENT: {
+			if (event.window.event == SDL_WINDOWEVENT_MOVED) {
+				vec2 new_pos = GetRealWindowPos();
+				game->WindowMove(new_pos);
+				oldWindowPos = new_pos;
 			}
 		}
 
-		if (game->state == Game::STATE_EXIT) exitapp = 1;
+		default: break;
+		}
 	}
+}
+
+int main(int argc, char** argv)
+{
+	SDL_SetHintWithPriority(SDL_HINT_RENDER_VSYNC, "0", SDL_HINT_OVERRIDE);
+	printf("application started.\n");
+	SDL_Init(SDL_INIT_EVERYTHING);
+#ifdef ADVANCEDGL
+#ifdef FULLSCREEN
+	window = SDL_CreateWindow(WindowName, 50, 50, ScreenWidth, ScreenHeight, SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL);
+#else
+	window = SDL_CreateWindow(
+		WindowName,
+		SDL_WINDOWPOS_CENTERED,
+		SDL_WINDOWPOS_CENTERED,
+		ScreenWidth, ScreenHeight,
+		SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL
+	);
+#endif
+	SDL_GLContext glContext = SDL_GL_CreateContext(window);
+	SDL_SetWindowHitTest(window, hitTestCallback, NULL);
+	init();
+#else
+#ifdef FULLSCREEN
+	window = SDL_CreateWindow(WindowName, 100, 100, ScreenWidth, ScreenHeight, SDL_WINDOW_FULLSCREEN);
+#else
+	window = SDL_CreateWindow(WindowName, 100, 100, ScreenWidth, ScreenHeight, SDL_WINDOW_SHOWN);
+#endif
+	surface = new Surface(ScreenWidth, ScreenHeight);
+	surface->Clear(0);
+	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	SDL_Texture* frameBuffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, ScreenWidth, ScreenHeight);
+#endif
+
+	// get and set monitor size
+	SDL_DisplayMode dm;
+	SDL_GetCurrentDisplayMode(0, &dm);
+	monitorSize = vec2(dm.w, dm.h);
+
+	// initialize game and window position
+	game = new Game(surface);
+	oldWindowPos = GetRealWindowPos();
+
+	// windows normally freezes windows when dragged,
+	// so if we're on windows run the game loop in
+	// a separate thread instead so it keeps updating
+	SDL_Thread* gameThread = SDL_CreateThread(gameLoop, "gameLoop", 0);
+	eventLoop();
+	SDL_WaitThread(gameThread, NULL);
+
 	game->Shutdown();
 	SDL_Quit();
 	return 0;
