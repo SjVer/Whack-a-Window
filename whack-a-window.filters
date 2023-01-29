@@ -33,4 +33,7 @@
   <ItemGroup>
     <None Include="clean.bat" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="needed.txt" />
+  </ItemGroup>
 </Project>
