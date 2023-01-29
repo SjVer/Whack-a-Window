@@ -259,7 +259,6 @@
     <ClInclude Include="src\text.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="clean.bat" />
     <CopyFileToFolders Include="win\dlls_x64\SDL2.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
