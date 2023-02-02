@@ -12,7 +12,7 @@ namespace Tmpl8 {
 #define BG_TILE_SIZE 50		
 #define TEXT_SCALE 4
 
-#define BALL_VEL_SCALE 0.2
+#define BALL_BOUNCE_SCALE 1
 #define MAX_STARS 10
 #define STAR_MAX_VEL 0.5f
 #define TOTAL_TIME 60
@@ -69,7 +69,7 @@ void Game::WindowMove(vec2 newPos) {
 	vec2 diff = newPos - GetWindowPos();
 
 	if (ball->collider.CollideWithBorders(screen))
-		ball->vel = diff * BALL_VEL_SCALE;
+		ball->vel = diff * BALL_BOUNCE_SCALE;
 }
 
 void Game::DrawBackground() {
@@ -160,7 +160,7 @@ void Game::TickGame(float deltaTime) {
 	starSprite.DrawScaled(10, 10, 25, 25, screen);
 	DrawText(screen, vec2(40, 2), 1, NONE, formatString("%d", score));
 	DrawText(screen, vec2(10, 2), 1, RIGHT_ALIGN, formatString("%d", secondsLeft));
-	DrawText(screen, vec2(10, 40), 1, RIGHT_ALIGN, formatString("%f", deltaTime));
+	DrawText(screen, vec2(10, 40), 1, RIGHT_ALIGN, formatString("%.3f", deltaTime));
 }
 
 void Game::TickStartMenu() {
@@ -209,8 +209,6 @@ void Game::TickScoreMenu() {
 }
 
 void Game::Tick(float deltaTime) {
-	_ASSERTE(screen->GetBuffer());
-
 	switch (state) {
 		case STATE_STARTMENU:
 			TickStartMenu();

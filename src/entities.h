@@ -5,8 +5,6 @@ namespace Tmpl8 {
 
 #define BALL_SCALE 0.5
 #define BALL_ASSET "assets/RollingBall/ball_red_large.png"
-#define MAX_VEL 5.f
-#define DRAG_FACTOR 0.99
 
 #define STAR_SCALE 2
 #define STAR_ASSET "assets/RollingBall/star.png"

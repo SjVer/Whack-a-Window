@@ -2,6 +2,9 @@
 
 namespace Tmpl8 {
 
+#define MAX_VEL 5.f
+#define DRAG_AMOUNT 0.01
+
 Ball::Ball(Surface* s) {
     surface = s;
     sprite = new Sprite(new Surface(BALL_ASSET), 1);
@@ -16,7 +19,7 @@ Ball::Ball(Surface* s) {
 }
 
 void Ball::Update(float deltaTime) {
-    vel *= DRAG_FACTOR;
+    vel -= vel * DRAG_AMOUNT;
     vel.x = Min(vel.x, MAX_VEL);
     vel.y = Min(vel.y, MAX_VEL);
 

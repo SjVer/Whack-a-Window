@@ -34,6 +34,7 @@ extern "C"
 #include "gl.h"
 #ifdef WINDOWS
 #include "wglext.h"
+#include "SDL_syswm.h"
 #else
 #include "glext.h"
 #endif
@@ -179,12 +180,8 @@ Game* game = 0;
 SDL_Window* window = 0;
 vec2 oldWindowPos;
 vec2 monitorSize;
-
-struct {
-	bool locked = false;
-	int count = 0;
-	SDL_Event* events;
-} eventsBuffer;
+bool dragTimerRunning = true;
+timer t;
 
 vec2 Tmpl8::GetMonitorSize() {
 	return monitorSize;
@@ -295,18 +292,70 @@ void swap()
 
 #endif
 
-SDL_HitTestResult hitTestCallback(SDL_Window*, const SDL_Point*, void* game) {
+SDL_HitTestResult hitTestCallback(SDL_Window*, const SDL_Point*, void*) {
 	return SDL_HITTEST_DRAGGABLE;
 }
 
-int gameLoop(void*) {
-	timer t;
-	t.reset();
-	while (game->state != Game::STATE_EXIT)
+void tickGame();
+
+int handleEvent(void*, SDL_Event* event) {
+	switch (event->type)
 	{
+	case SDL_SYSWMEVENT: {
+		// this, and other window-dragging related code adapted from
+		// https://www.appsloveworld.com/cplus/100/61/keep-window-active-while-being-dragged-sdl-on-win32
+		const auto& winMessage = event->syswm.msg->msg.win;
+		if (winMessage.msg == WM_ENTERSIZEMOVE) {
+			// the user started dragging, so create the timer (with the minimum timeout)
+			dragTimerRunning = SetTimer(GetActiveWindow(), 1, USER_TIMER_MINIMUM, NULL);
+		}
+		else if (winMessage.msg == WM_TIMER && winMessage.wParam == 1) {
+			// user is dragging, update the game anyway
+			tickGame();
+		}
+		break;
+	}
+
+	case SDL_QUIT:
+		game->state = Game::STATE_EXIT;
+		break;
+	case SDL_KEYDOWN:
+		game->KeyDown(event->key.keysym.scancode);
+		break;
+	case SDL_KEYUP:
+		game->KeyUp(event->key.keysym.scancode);
+		break;
+	case SDL_MOUSEMOTION: {
+		vec2 pos(event->motion.x, event->motion.y);
+		game->MouseMove(pos);
+		game->mousePos = pos;
+		break;
+	}
+	case SDL_MOUSEBUTTONUP:
+		game->MouseUp(event->button.button);
+		break;
+	case SDL_MOUSEBUTTONDOWN:
+		game->MouseDown(event->button.button);
+		break;
+
+	case SDL_WINDOWEVENT: {
+		if (event->window.event == SDL_WINDOWEVENT_MOVED) {
+			vec2 new_pos = GetRealWindowPos();
+			game->WindowMove(new_pos);
+			oldWindowPos = new_pos;
+		}
+	}
+
+	default: break;
+	}
+
+	return 0;
+}
+
+void tickGame() {
 #ifdef ADVANCEDGL
-		swap();
-		surface->SetBuffer((Pixel*)framedata);
+	swap();
+	surface->SetBuffer((Pixel*)framedata);
 #else
 		void* target = 0;
 		int pitch;
@@ -329,65 +378,10 @@ int gameLoop(void*) {
 		SDL_RenderPresent(renderer);
 
 #endif
-		// calculate frame time and pass it to game->Tick
-		float elapsedTime = t.elapsed();
-		t.reset();
-		game->Tick(elapsedTime);
-
-		// handle events
-		eventsBuffer.locked = true;
-		eventsBuffer.count = SDL_PeepEvents(0, INT_MAX, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
-		eventsBuffer.events = new SDL_Event[eventsBuffer.count];
-		SDL_PeepEvents(0, eventsBuffer.count, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
-		eventsBuffer.locked = false;
-	}
-
-	return 0;
-}
-
-int eventLoop(void*) {
-	SDL_Event event;
-	while (game->state != Game::STATE_EXIT) {
-		while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT) == 1) {
-			printf("event!\n");
-			switch (event.type)
-			{
-			case SDL_QUIT:
-				game->state = Game::STATE_EXIT;
-				break;
-			case SDL_KEYDOWN:
-				game->KeyDown(event.key.keysym.scancode);
-				break;
-			case SDL_KEYUP:
-				game->KeyUp(event.key.keysym.scancode);
-				break;
-			case SDL_MOUSEMOTION: {
-				vec2 pos(event.motion.x, event.motion.y);
-				game->MouseMove(pos);
-				game->mousePos = pos;
-				break;
-			}
-			case SDL_MOUSEBUTTONUP:
-				game->MouseUp(event.button.button);
-				break;
-			case SDL_MOUSEBUTTONDOWN:
-				game->MouseDown(event.button.button);
-				break;
-
-			case SDL_WINDOWEVENT: {
-				if (event.window.event == SDL_WINDOWEVENT_MOVED) {
-					vec2 new_pos = GetRealWindowPos();
-					game->WindowMove(new_pos);
-					oldWindowPos = new_pos;
-				}
-			}
-
-			default: break;
-			}
-		}
-	}
-
-	return 0;
+	// calculate frame time and pass it to game->Tick
+	float elapsedTime = t.elapsed();
+	t.reset();
+	game->Tick(elapsedTime);
 }
 
 int main(int argc, char** argv)
@@ -409,7 +403,7 @@ int main(int argc, char** argv)
 #endif
 	SDL_GLContext glContext = SDL_GL_CreateContext(window);
 	SDL_SetWindowHitTest(window, hitTestCallback, NULL);
-	_ASSERTE(init());
+	init();
 #else
 #ifdef FULLSCREEN
 	window = SDL_CreateWindow(WindowName, 100, 100, ScreenWidth, ScreenHeight, SDL_WINDOW_FULLSCREEN);
@@ -422,6 +416,12 @@ int main(int argc, char** argv)
 	SDL_Texture* frameBuffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, ScreenWidth, ScreenHeight);
 #endif
 
+#ifdef WINDOWS
+	// make sure the game keeps running while dragging the window
+	SDL_AddEventWatch(handleEvent, NULL);
+	SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
+#endif
+
 	// get and set monitor size
 	SDL_DisplayMode dm;
 	SDL_GetCurrentDisplayMode(0, &dm);
@@ -431,13 +431,19 @@ int main(int argc, char** argv)
 	game = new Game(surface);
 	oldWindowPos = GetRealWindowPos();
 
-	// windows normally freezes windows when dragged,
-	// so if we're on windows run the game loop in
-	// a separate thread instead so it keeps updating
-
-	SDL_Thread* eventThread = SDL_CreateThread(eventLoop, "eventLoop", 0);
-	gameLoop(0);
-	SDL_WaitThread(eventThread, NULL);
+	t.reset();
+	while (game->state != Game::STATE_EXIT) {
+		SDL_Event event;
+		while (SDL_PollEvent(&event)) {
+			if (dragTimerRunning) {
+				// draggin ended, so kill the timer
+				KillTimer(GetActiveWindow(), 1);
+				dragTimerRunning = false;
+			}
+			handleEvent(NULL, &event);
+		}
+		tickGame();
+	}
 
 	game->Shutdown();
 	SDL_Quit();
