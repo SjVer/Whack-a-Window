@@ -180,6 +180,12 @@ SDL_Window* window = 0;
 vec2 oldWindowPos;
 vec2 monitorSize;
 
+struct {
+	bool locked = false;
+	int count = 0;
+	SDL_Event* events;
+} eventsBuffer;
+
 vec2 Tmpl8::GetMonitorSize() {
 	return monitorSize;
 }
@@ -225,6 +231,7 @@ bool createFBtexture()
 	glBindTexture(GL_TEXTURE_2D, framebufferTexID[0]);
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, fbPBO[0]);
 	framedata = (unsigned char*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY_ARB);
+	if (!framedata) return false;
 	memset(framedata, 0, ScreenWidth * ScreenHeight * 4);
 	return (glGetError() == 0);
 }
@@ -269,7 +276,6 @@ void swap()
 	nextindex = (index + 1) % 2;
 	index = (index + 1) % 2;
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, fbPBO[nextindex]);
-	// TODO: glMapBuffer returns NULL??
 	framedata = (unsigned char*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY_ARB);
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glBegin(GL_QUADS);
@@ -327,57 +333,68 @@ int gameLoop(void*) {
 		float elapsedTime = t.elapsed();
 		t.reset();
 		game->Tick(elapsedTime);
+
+		// handle events
+		eventsBuffer.locked = true;
+		eventsBuffer.count = SDL_PeepEvents(0, INT_MAX, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
+		eventsBuffer.events = new SDL_Event[eventsBuffer.count];
+		SDL_PeepEvents(0, eventsBuffer.count, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
+		eventsBuffer.locked = false;
 	}
 
 	return 0;
 }
 
-void eventLoop() {
+int eventLoop(void*) {
 	SDL_Event event;
-	while (SDL_PollEvent(&event))
-	{
-		switch (event.type)
-		{
-		case SDL_QUIT:
-			game->state = Game::STATE_EXIT;
-			break;
-		case SDL_KEYDOWN:
-			game->KeyDown(event.key.keysym.scancode);
-			break;
-		case SDL_KEYUP:
-			game->KeyUp(event.key.keysym.scancode);
-			break;
-		case SDL_MOUSEMOTION: {
-			vec2 pos(event.motion.x, event.motion.y);
-			game->MouseMove(pos);
-			game->mousePos = pos;
-			break;
-		}
-		case SDL_MOUSEBUTTONUP:
-			game->MouseUp(event.button.button);
-			break;
-		case SDL_MOUSEBUTTONDOWN:
-			game->MouseDown(event.button.button);
-			break;
+	while (game->state != Game::STATE_EXIT) {
+		while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT) == 1) {
+			printf("event!\n");
+			switch (event.type)
+			{
+			case SDL_QUIT:
+				game->state = Game::STATE_EXIT;
+				break;
+			case SDL_KEYDOWN:
+				game->KeyDown(event.key.keysym.scancode);
+				break;
+			case SDL_KEYUP:
+				game->KeyUp(event.key.keysym.scancode);
+				break;
+			case SDL_MOUSEMOTION: {
+				vec2 pos(event.motion.x, event.motion.y);
+				game->MouseMove(pos);
+				game->mousePos = pos;
+				break;
+			}
+			case SDL_MOUSEBUTTONUP:
+				game->MouseUp(event.button.button);
+				break;
+			case SDL_MOUSEBUTTONDOWN:
+				game->MouseDown(event.button.button);
+				break;
 
-		case SDL_WINDOWEVENT: {
-			if (event.window.event == SDL_WINDOWEVENT_MOVED) {
-				vec2 new_pos = GetRealWindowPos();
-				game->WindowMove(new_pos);
-				oldWindowPos = new_pos;
+			case SDL_WINDOWEVENT: {
+				if (event.window.event == SDL_WINDOWEVENT_MOVED) {
+					vec2 new_pos = GetRealWindowPos();
+					game->WindowMove(new_pos);
+					oldWindowPos = new_pos;
+				}
+			}
+
+			default: break;
 			}
 		}
-
-		default: break;
-		}
 	}
+
+	return 0;
 }
 
 int main(int argc, char** argv)
 {
 	SDL_SetHintWithPriority(SDL_HINT_RENDER_VSYNC, "0", SDL_HINT_OVERRIDE);
 	printf("application started.\n");
-	SDL_Init(SDL_INIT_EVERYTHING);
+	SDL_Init(SDL_INIT_VIDEO);
 #ifdef ADVANCEDGL
 #ifdef FULLSCREEN
 	window = SDL_CreateWindow(WindowName, 50, 50, ScreenWidth, ScreenHeight, SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL);
@@ -392,7 +409,7 @@ int main(int argc, char** argv)
 #endif
 	SDL_GLContext glContext = SDL_GL_CreateContext(window);
 	SDL_SetWindowHitTest(window, hitTestCallback, NULL);
-	init();
+	_ASSERTE(init());
 #else
 #ifdef FULLSCREEN
 	window = SDL_CreateWindow(WindowName, 100, 100, ScreenWidth, ScreenHeight, SDL_WINDOW_FULLSCREEN);
@@ -417,9 +434,10 @@ int main(int argc, char** argv)
 	// windows normally freezes windows when dragged,
 	// so if we're on windows run the game loop in
 	// a separate thread instead so it keeps updating
-	SDL_Thread* gameThread = SDL_CreateThread(gameLoop, "gameLoop", 0);
-	eventLoop();
-	SDL_WaitThread(gameThread, NULL);
+
+	SDL_Thread* eventThread = SDL_CreateThread(eventLoop, "eventLoop", 0);
+	gameLoop(0);
+	SDL_WaitThread(eventThread, NULL);
 
 	game->Shutdown();
 	SDL_Quit();
