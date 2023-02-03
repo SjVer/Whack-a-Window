@@ -16,7 +16,7 @@ The files `templace.cpp`, `template.h`, `surface.cpp` and `surface.h` are adapte
 
 ## References/Credits
 
-The use of pre-existing code (apart from the changes mentioned above) is always denoted by a comment and a reference to its source. The assets have their licences or readme's included.
+The use of pre-existing code (apart from the changes mentioned above) is always denoted by a comment and a reference to its source. All sounds have been downloaded from FreeSound. The other assets have their licences or readme's included.
 
 ## Building
 

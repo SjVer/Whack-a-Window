@@ -28,6 +28,9 @@ Scores top3 = Scores();
 
 Game::Game(Surface* screen): screen(screen) {
 	Reset(STATE_STARTMENU);
+	clearScores();
+	saveScore("SjVer", 23);
+	saveScore("BuasBoii", 8);
 }
 
 void Game::Reset(int newState) {
@@ -160,7 +163,12 @@ void Game::TickGame(float deltaTime) {
 	starSprite.DrawScaled(10, 10, 25, 25, screen);
 	DrawText(screen, vec2(40, 2), 1, NONE, formatString("%d", score));
 	DrawText(screen, vec2(10, 2), 1, RIGHT_ALIGN, formatString("%d", secondsLeft));
-	DrawText(screen, vec2(10, 40), 1, RIGHT_ALIGN, formatString("%.3f", deltaTime));
+
+#ifdef _DEBUG
+	// draw fps
+	int fps = (1000 / deltaTime);
+	DrawText(screen, vec2(10, 40), 1, RIGHT_ALIGN, formatString("%d fps", fps));
+#endif
 }
 
 void Game::TickStartMenu() {

@@ -3,3 +3,4 @@ bin/
 .vscode/
 *.filters
 *.user
+scores.bin

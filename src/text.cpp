@@ -1,5 +1,6 @@
 #include "text.h"
 #include <cstdarg>
+#include <cassert>
 
 namespace Tmpl8 {
 
@@ -22,7 +23,7 @@ bool InitFont() {
 }
 
 // init font automatically
-bool _discard = InitFont();
+bool _discard = (assert(InitFont()), true);
 
 char* formatString(const char *format, ...) {
     va_list args;

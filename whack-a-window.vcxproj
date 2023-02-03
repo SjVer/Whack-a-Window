@@ -245,6 +245,7 @@
     <ClCompile Include="src\entities.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\scores.cpp" />
+    <ClCompile Include="src\sound.cpp" />
     <ClCompile Include="src\surface.cpp" />
     <ClCompile Include="src\template.cpp" />
     <ClCompile Include="src\text.cpp" />
@@ -254,6 +255,7 @@
     <ClInclude Include="src\entities.h" />
     <ClInclude Include="src\game.h" />
     <ClInclude Include="src\scores.h" />
+    <ClInclude Include="src\sound.h" />
     <ClInclude Include="src\surface.h" />
     <ClInclude Include="src\template.h" />
     <ClInclude Include="src\text.h" />

@@ -1,9 +1,10 @@
 #include "entities.h"
+#include "sound.h"
 
 namespace Tmpl8 {
 
-#define MAX_VEL 5.f
-#define DRAG_AMOUNT 0.01
+#define MAX_VEL 3.f
+#define DRAG_AMOUNT 0.001f
 
 Ball::Ball(Surface* s) {
     surface = s;
@@ -19,7 +20,7 @@ Ball::Ball(Surface* s) {
 }
 
 void Ball::Update(float deltaTime) {
-    vel -= vel * DRAG_AMOUNT;
+    vel *= Max(1. - DRAG_AMOUNT * deltaTime, 0.);
     vel.x = Min(vel.x, MAX_VEL);
     vel.y = Min(vel.y, MAX_VEL);
 
@@ -28,6 +29,8 @@ void Ball::Update(float deltaTime) {
 
     // clamp to collided window border and bounce
     if (Collision coll = collider.CollideWithBorders(surface)) {
+        PlaySound(SOUND_BOUNCE);
+
         if (coll.left || coll.right) {
             pos.x = coll.left ? wpos.x : wpos.x + surface->GetWidth() - size.x; 
             vel.x *= -1;
@@ -53,8 +56,6 @@ Star::Star(Surface* s, vec2 p) {
 }
 
 void Star::Update(float deltaTime) {
-    // pos += vel * (deltaTime / 1000.);
-
     if (!collider.IsOutsideSurface(surface)) {
         vec2 lpos = pos - GetWindowPos();
         starSprite.DrawScaled(lpos.x, lpos.y, size.x, size.y, surface);

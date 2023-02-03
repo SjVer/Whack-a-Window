@@ -301,6 +301,7 @@ void tickGame();
 int handleEvent(void*, SDL_Event* event) {
 	switch (event->type)
 	{
+#ifdef WINDOWS
 	case SDL_SYSWMEVENT: {
 		// this, and other window-dragging related code adapted from
 		// https://www.appsloveworld.com/cplus/100/61/keep-window-active-while-being-dragged-sdl-on-win32
@@ -315,6 +316,7 @@ int handleEvent(void*, SDL_Event* event) {
 		}
 		break;
 	}
+#endif
 
 	case SDL_QUIT:
 		game->state = Game::STATE_EXIT;
@@ -388,7 +390,7 @@ int main(int argc, char** argv)
 {
 	SDL_SetHintWithPriority(SDL_HINT_RENDER_VSYNC, "0", SDL_HINT_OVERRIDE);
 	printf("application started.\n");
-	SDL_Init(SDL_INIT_VIDEO);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 #ifdef ADVANCEDGL
 #ifdef FULLSCREEN
 	window = SDL_CreateWindow(WindowName, 50, 50, ScreenWidth, ScreenHeight, SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL);
@@ -435,11 +437,13 @@ int main(int argc, char** argv)
 	while (game->state != Game::STATE_EXIT) {
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
+#ifdef WINDOWS
 			if (dragTimerRunning) {
 				// draggin ended, so kill the timer
 				KillTimer(GetActiveWindow(), 1);
 				dragTimerRunning = false;
 			}
+#endif
 			handleEvent(NULL, &event);
 		}
 		tickGame();

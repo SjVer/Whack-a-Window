@@ -12,8 +12,6 @@ Scores getScores() {
     FILE* f = fopen(SCORES_FILE, "rb");
     if (!f) {
         printf("No scores file!\n");
-        fclose(fopen(SCORES_FILE, "w"));
-        f = fopen(SCORES_FILE, "rb");
         return Scores();
 	}
     
@@ -26,7 +24,8 @@ Scores getScores() {
             size, sizeof(ScoresEntry),
             size % sizeof(ScoresEntry)
         );
-        fclose(fopen(SCORES_FILE, "w"));
+        fclose(f);
+        clearScores();
         return Scores();
     }
 
@@ -53,6 +52,7 @@ Scores getTop3Scores() {
 }
 
 void clearScores() {
+    printf("removed scores file!\n");
     remove(SCORES_FILE);
 }
 
@@ -61,7 +61,7 @@ void saveScore(char* name, int score) {
         printf("Name too long! (%s)\n", name);
         return;
     }
-
+    
     FILE* f = fopen(SCORES_FILE, "ab");
     if (!f) {
         printf("Could not open scores file!");

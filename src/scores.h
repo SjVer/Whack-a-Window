@@ -6,7 +6,7 @@ using std::vector;
 
 namespace Tmpl8 {
 
-#define NAME_LEN 5
+#define NAME_LEN 8
 
 struct ScoresEntry {
     char name[NAME_LEN];
