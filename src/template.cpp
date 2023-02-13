@@ -322,7 +322,8 @@ int handleEvent(void*, SDL_Event* event) {
 		game->state = Game::STATE_EXIT;
 		break;
 	case SDL_KEYDOWN:
-		game->KeyDown(event->key.keysym.scancode);
+		if (event->key.repeat == 0) 
+			game->KeyDown(event->key.keysym.scancode);
 		break;
 	case SDL_KEYUP:
 		game->KeyUp(event->key.keysym.scancode);
