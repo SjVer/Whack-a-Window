@@ -51,7 +51,7 @@ int PlaySingleSoundWorker(enum sound sound) {
 
     if (SDL_OpenAudio(&data.spec, NULL) != 0) {
         SDL_ShowSimpleMessageBox(0, "Error", "Audio driver failed to initialize", NULL);
-        exit(1);
+        return 1;
     }
 
     SDL_PauseAudio(0);

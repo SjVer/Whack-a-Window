@@ -29,7 +29,7 @@ void Ball::Update(float deltaTime) {
 
     // clamp to collided window border and bounce
     if (Collision coll = collider.CollideWithBorders(surface)) {
-        PlaySingleSound(SOUND_BOUNCE);
+        //PlaySingleSound(SOUND_BOUNCE);
 
         if (coll.left || coll.right) {
             pos.x = coll.left ? wpos.x : wpos.x + surface->GetWidth() - size.x; 
