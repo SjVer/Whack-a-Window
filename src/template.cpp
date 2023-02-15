@@ -314,6 +314,10 @@ int handleSyswmEvent(void*, SDL_Event* event) {
 		}
 		else if (winMessage.msg == WM_TIMER && winMessage.wParam == 1) {
 			// user is dragging, update the game anyway
+			vec2 newPos = GetWindowPos();
+			vec2 diff = newPos - oldWindowPos;
+			game->WindowMove(diff);
+			oldWindowPos = newPos;
 			tickGame();
 		}
 	}

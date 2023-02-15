@@ -12,7 +12,7 @@ namespace Tmpl8 {
 #define BG_TILE_SIZE 50		
 #define TEXT_SCALE 4
 
-#define BALL_BOUNCE_SCALE 1
+#define BALL_BOUNCE_SCALE 0.1
 #define MAX_STARS 10
 #define STAR_MAX_VEL 0.5f
 #define TOTAL_TIME 60
@@ -147,7 +147,7 @@ void Game::TickGame(float deltaTime) {
 		// check if the player has hit the star
 		if (star->collider.CollidesWith(ball->collider)) {
 			// hit! delete star and increment score
-			stars.erase(it);
+			it = stars.erase(it);
 			score++;
 		} else {
 			// update the star

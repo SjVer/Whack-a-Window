@@ -23,8 +23,8 @@ public:
         pos(pos_ptr), radius(radius) {}
 
     bool CollidesWith(CollisionCircle& coll) {
-        vec2 realPos = *pos + vec2(radius, radius);
-        vec2 otherRealPos = *coll.pos + vec2(coll.radius, coll.radius); 
+        vec2 realPos = *pos + vec2(radius, radius) * 2;
+        vec2 otherRealPos = *coll.pos + vec2(coll.radius, coll.radius) * 2; 
         vec2 dist = realPos - otherRealPos;
         return dist.length() <= radius + coll.radius;
     }

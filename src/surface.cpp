@@ -474,7 +474,12 @@ void Sprite::DrawScaled( int a_X, int a_Y, int a_Width, int a_Height, Surface* a
 		uint b = color & BlueMask;
 		uint luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
 
-		if (luma > 100) a_Target->GetBuffer()[a_X + x + ((a_Y + y) * a_Target->GetPitch())] = color;
+		int realX = a_X + x;
+		int realY = a_Y + y;
+		int index = realX + (realY * a_Target->GetPitch());
+
+		if (index <= a_Target->GetWidth() * a_Target->GetHeight())
+			if (luma > 100) a_Target->GetBuffer()[index] = color;
 	}
 }
 
