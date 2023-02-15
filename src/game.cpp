@@ -15,7 +15,7 @@ namespace Tmpl8 {
 #define BALL_BOUNCE_SCALE 1
 #define MAX_STARS 10
 #define STAR_MAX_VEL 0.5f
-#define TOTAL_TIME 0
+#define TOTAL_TIME 60
 #define STAR_SPAWN_DELAY 2
 #define SPAWN_DIST 100
 #define SPAWN_MARGIN 100

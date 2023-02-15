@@ -326,34 +326,34 @@ int handleSyswmEvent(void*, SDL_Event* event) {
 }
 #endif
 
-int handleEvent(void*, SDL_Event* event) {
-	switch (event->type)
+void handleEvent(SDL_Event event) {
+	switch (event.type)
 	{
 	case SDL_QUIT:
 		game->state = Game::STATE_EXIT;
 		break;
 	case SDL_KEYDOWN:
-		if (event->key.repeat == 0) 
-			game->KeyDown(event->key.keysym.scancode);
+		if (event.key.repeat == 0) 
+			game->KeyDown(event.key.keysym.scancode);
 		break;
 	case SDL_KEYUP:
-		game->KeyUp(event->key.keysym.scancode);
+		game->KeyUp(event.key.keysym.scancode);
 		break;
 	case SDL_MOUSEMOTION: {
-		vec2 pos(event->motion.x, event->motion.y);
+		vec2 pos(event.motion.x, event.motion.y);
 		game->MouseMove(pos);
 		game->mousePos = pos;
 		break;
 	}
 	case SDL_MOUSEBUTTONUP:
-		game->MouseUp(event->button.button);
+		game->MouseUp(event.button.button);
 		break;
 	case SDL_MOUSEBUTTONDOWN:
-		game->MouseDown(event->button.button);
+		game->MouseDown(event.button.button);
 		break;
 
 	case SDL_WINDOWEVENT: {
-		if (event->window.event == SDL_WINDOWEVENT_MOVED) {
+		if (event.window.event == SDL_WINDOWEVENT_MOVED) {
 			vec2 new_pos = GetRealWindowPos();
 			game->WindowMove(new_pos);
 			oldWindowPos = new_pos;
@@ -362,8 +362,6 @@ int handleEvent(void*, SDL_Event* event) {
 
 	default: break;
 	}
-
-	return 0;
 }
 
 void tickGame() {
@@ -459,7 +457,7 @@ int main(int argc, char** argv)
 				dragTimerRunning = false;
 			}
 #endif
-			handleEvent(NULL, &event);
+			handleEvent(event);
 		}
 		tickGame();
 	}
