@@ -8,7 +8,7 @@ In *Whack 'a Window*, the goal is to collect as many stars as possible within 60
 
 ## Controls
 
-Control the bouncing ball by dragging the window around. The ball will bounce off the window's borders. Any other controls (such as the exit key) are clearly explained in-game.
+Control the bouncing ball by dragging the window around. The ball will bounce off the window's borders. Any other controls (such as the exit key) are clearly explained in-game. Using a mouse is highly recommended!
 
 ## Additional information
 

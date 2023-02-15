@@ -298,13 +298,19 @@ SDL_HitTestResult hitTestCallback(SDL_Window*, const SDL_Point*, void*) {
 
 void tickGame();
 
-int handleEvent(void*, SDL_Event* event) {
-	switch (event->type)
-	{
 #ifdef WINDOWS
-	case SDL_SYSWMEVENT: {
+int handleSyswmEvent(void*, SDL_Event* event) {
+	// this handler is for windows system events only
+	if (event->type == SDL_SYSWMEVENT) {
 		// this, and other window-dragging related code adapted from
 		// https://www.appsloveworld.com/cplus/100/61/keep-window-active-while-being-dragged-sdl-on-win32
+		//
+		// when dragging a window, windows pauses the main thread. so if we want to keep
+		// the game loop running we need to bypass that. this event handler is called
+		// outside of the main thread, and if there's a timer running windows will keep
+		// sending timer events to this handler. we can abuse this to keep the game
+		// loop running while the window is being dragged. cool right?
+
 		const auto& winMessage = event->syswm.msg->msg.win;
 		if (winMessage.msg == WM_ENTERSIZEMOVE) {
 			// the user started dragging, so create the timer (with the minimum timeout)
@@ -314,10 +320,15 @@ int handleEvent(void*, SDL_Event* event) {
 			// user is dragging, update the game anyway
 			tickGame();
 		}
-		break;
 	}
+
+	return 0;
+}
 #endif
 
+int handleEvent(void*, SDL_Event* event) {
+	switch (event->type)
+	{
 	case SDL_QUIT:
 		game->state = Game::STATE_EXIT;
 		break;
@@ -421,7 +432,7 @@ int main(int argc, char** argv)
 
 #ifdef WINDOWS
 	// make sure the game keeps running while dragging the window
-	SDL_AddEventWatch(handleEvent, NULL);
+	SDL_AddEventWatch(handleSyswmEvent, NULL);
 	SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
 #endif
 
@@ -440,7 +451,10 @@ int main(int argc, char** argv)
 		while (SDL_PollEvent(&event)) {
 #ifdef WINDOWS
 			if (dragTimerRunning) {
-				// draggin ended, so kill the timer
+				// this thread only continues to run after
+				// the window dragging has ended, so if
+				// we reach this we know the window was just
+				// dragged and we can kill the timer.
 				KillTimer(GetActiveWindow(), 1);
 				dragTimerRunning = false;
 			}

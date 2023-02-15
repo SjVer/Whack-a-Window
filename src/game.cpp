@@ -28,9 +28,11 @@ Scores top3 = Scores();
 
 Game::Game(Surface* screen): screen(screen) {
 	Reset(STATE_STARTMENU);
+
+	// temporary fake scores for showing-off's sake
 	clearScores();
-	saveScore("SjVer", 23);
-	saveScore("BuasBoii", 8);
+	saveScore(new char[NAME_LEN] { "sjver" }, 23);
+	saveScore(new char[NAME_LEN] { "buasboi" }, 8);
 }
 
 void Game::Reset(int newState) {
