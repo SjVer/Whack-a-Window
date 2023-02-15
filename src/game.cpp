@@ -70,9 +70,7 @@ void Game::SpawnStar(uint attempt = 0) {
 void Game::Shutdown() {
 }
 
-void Game::WindowMove(vec2 newPos) {
-	vec2 diff = newPos - GetWindowPos();
-
+void Game::WindowMove(vec2 diff) {
 	if (ball->collider.CollideWithBorders(screen))
 		ball->vel = diff * BALL_BOUNCE_SCALE;
 }
@@ -142,19 +140,20 @@ void Game::TickGame(float deltaTime) {
 	ball->Update(deltaTime);
 
 	// update stars
-	for (auto it = stars.begin(); it != stars.end();) {
+	vector<Star*>::iterator it = stars.begin();
+	while (it != stars.end()) {
 		Star* star = *it;
 
 		// check if the player has hit the star
 		if (star->collider.CollidesWith(ball->collider)) {
+			// hit! delete star and increment score
 			stars.erase(it);
 			score++;
-			continue;
+		} else {
+			// update the star
+			star->Update(deltaTime);
+			it++;
 		}
-
-		// update the star
-		star->Update(deltaTime);
-		it++;
 	}
 
 	// update time left

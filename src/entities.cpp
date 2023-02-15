@@ -40,7 +40,7 @@ void Ball::Update(float deltaTime) {
             vel.y *= -1;
         }
     }
-    
+   
     vec2 lpos = pos - wpos;
     sprite->DrawScaled(lpos.x, lpos.y, size.x, size.y, surface);
 }

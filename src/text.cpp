@@ -23,7 +23,7 @@ bool InitFont() {
 }
 
 // init font automatically
-bool _discard = (assert(InitFont()), true);
+bool _discard = InitFont();
 
 char* formatString(const char *format, ...) {
     va_list args;

@@ -188,17 +188,13 @@ vec2 Tmpl8::GetMonitorSize() {
 }
 
 vec2 Tmpl8::GetWindowPos() {
-	return oldWindowPos;
+	int x, y;
+	SDL_GetWindowPosition(window, &x, &y);
+	return vec2(x, y);
 }
 
 Surface* Tmpl8::GetWindowSurface() {
 	return surface;
-}
-
-vec2 GetRealWindowPos() {
-	int x, y;
-	SDL_GetWindowPosition(window, &x, &y);
-	return vec2(x, y);
 }
 
 #ifdef ADVANCEDGL
@@ -354,9 +350,10 @@ void handleEvent(SDL_Event event) {
 
 	case SDL_WINDOWEVENT: {
 		if (event.window.event == SDL_WINDOWEVENT_MOVED) {
-			vec2 new_pos = GetRealWindowPos();
-			game->WindowMove(new_pos);
-			oldWindowPos = new_pos;
+			vec2 newPos = GetWindowPos();
+			vec2 diff = newPos - oldWindowPos;
+			game->WindowMove(diff);
+			oldWindowPos = newPos;
 		}
 	}
 
@@ -441,7 +438,7 @@ int main(int argc, char** argv)
 
 	// initialize game and window position
 	game = new Game(surface);
-	oldWindowPos = GetRealWindowPos();
+	oldWindowPos = GetWindowPos();
 
 	t.reset();
 	while (game->state != Game::STATE_EXIT) {

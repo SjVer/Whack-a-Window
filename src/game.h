@@ -14,7 +14,7 @@ public:
 	Game(Surface* screen);
 	void Reset(int newState);
 	void Shutdown();
-	void WindowMove( vec2 new_pos );
+	void WindowMove( vec2 diff );
 	void Tick( float deltaTime );
 	void MouseUp( int button ) { /* implement if you want to detect mouse button presses */ }
 	void MouseDown( int button ) { /* implement if you want to detect mouse button presses */ }
