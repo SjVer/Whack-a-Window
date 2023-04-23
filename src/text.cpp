@@ -1,5 +1,9 @@
 #include "text.h"
 #include <cstdarg>
+<<<<<<< HEAD
+=======
+#include <cassert>
+>>>>>>> VisualStudio
 
 namespace Tmpl8 {
 

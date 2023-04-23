@@ -1,7 +1,13 @@
 bin/
 .vs/
 .vscode/
+<<<<<<< HEAD
 template/
 scores.bin
 Debug/
 Release/
+=======
+*.filters
+*.user
+scores.bin
+>>>>>>> VisualStudio

@@ -8,7 +8,11 @@ In *Whack 'a Window*, the goal is to collect as many stars as possible within 60
 
 ## Controls
 
+<<<<<<< HEAD
 Control the bouncing ball by dragging the window around. The ball will bounce off the window's borders. Any other controls (such as the exit key) are clearly explained in-game.
+=======
+Control the bouncing ball by dragging the window around. The ball will bounce off the window's borders. Any other controls (such as the exit key) are clearly explained in-game. Using a mouse is highly recommended!
+>>>>>>> VisualStudio
 
 ## Additional information
 
@@ -16,11 +20,19 @@ The files `templace.cpp`, `template.h`, `surface.cpp` and `surface.h` are adapte
 
 ## References/Credits
 
+<<<<<<< HEAD
 The use of pre-existing code (apart from the changes mentioned above) is always denoted by a comment and a reference to its source. The assets have their licences or readme's included.
 
 ## Building
 
 The game should build fine on Windows using Visual Studio.
+=======
+The use of pre-existing code (apart from the changes mentioned above) is always denoted by a comment and a reference to its source. All sounds have been downloaded from FreeSound. The other assets have their licences or readme's included.
+
+## Building
+
+The game should build fine on Windows using Visual Studio. The resulting executable should be located in the `bin/` directory.
+>>>>>>> VisualStudio
 
 On Linux, a library or two might need to be installed first. Then, simply run `make whack-a-window`. The resulting binary should be located in the `bin/` directory.
 
