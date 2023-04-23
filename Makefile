@@ -8,7 +8,7 @@ SHELL := /bin/bash
 
 MUTE = writable-strings uninitialized
 CXXFLAGS = -Wall $(addprefix -Wno-,$(MUTE)) -I/usr/include/SDL2 -I/usr/include/GL -g
-LDFLAGS = -lSDL2_test -lSDL2main -lSDL2 -lfreeimage -lGL
+LDFLAGS = -lSDL2_test -lSDL2main -lSDL2 -lSDL2_mixer -lfreeimage -lGL
 
 APPNAME = whack-a-window
 EXT = .cpp

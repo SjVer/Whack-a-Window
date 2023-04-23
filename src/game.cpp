@@ -12,7 +12,12 @@ namespace Tmpl8 {
 #define BG_TILE_SIZE 50		
 #define TEXT_SCALE 4
 
-#define BALL_BOUNCE_SCALE 0.1
+#ifdef __linux__
+#	define BALL_BOUNCE_SCALE 0.0001
+#else
+#	define BALL_BOUNCE_SCALE 0.1
+#endif
+
 #define MAX_STARS 10
 #define STAR_MAX_VEL 0.5f
 #define TOTAL_TIME 60

@@ -4,7 +4,12 @@
 namespace Tmpl8 {
 
 #define MAX_VEL 3.f
-#define DRAG_AMOUNT 0.001f
+
+#ifdef __linux__
+#   define DRAG_AMOUNT 0.000001f
+#else
+#   define DRAG_AMOUNT 0.001f
+#endif
 
 Ball::Ball(Surface* s) {
     surface = s;

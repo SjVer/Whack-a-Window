@@ -12,8 +12,9 @@ Mix_Chunk* sounds[1];
 
 bool InitSounds() {
 #define LOAD_WAV(ID, NAME) \
-    sounds[ID] = Mix_LoadWAV(SOUNDS_DIR ##NAME); \
-    SDL_assert_always(sounds[ID]); \
+    sounds[ID] = Mix_LoadWAV(SOUNDS_DIR NAME); \
+    SDL_assert_always(sounds[ID] && "Failed to load " SOUNDS_DIR NAME);
+    // printf("%s\n", Mix_GetError())
     
     LOAD_WAV(SOUND_BOUNCE, "bounce.wav");
 
