@@ -8,9 +8,6 @@
     <file name="FreeImage.dll"/>
 	<file name="glew32.dll"/>
 	<file name="SDL2.dll"/>
-<<<<<<< HEAD
-=======
 	<file name="SDL2_mixer.dll"/>
->>>>>>> VisualStudio
 	<file name="ucrtbased.dll"/>
 </assembly>

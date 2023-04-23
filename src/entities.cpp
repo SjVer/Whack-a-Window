@@ -1,9 +1,4 @@
 #include "entities.h"
-<<<<<<< HEAD
-
-namespace Tmpl8 {
-
-=======
 #include "sound.h"
 
 namespace Tmpl8 {
@@ -16,7 +11,6 @@ namespace Tmpl8 {
 #   define DRAG_AMOUNT 0.001f
 #endif
 
->>>>>>> VisualStudio
 Ball::Ball(Surface* s) {
     surface = s;
     sprite = new Sprite(new Surface(BALL_ASSET), 1);
@@ -31,28 +25,17 @@ Ball::Ball(Surface* s) {
 }
 
 void Ball::Update(float deltaTime) {
-<<<<<<< HEAD
-    vel *= DRAG_FACTOR;
-    vel.x = Min(vel.x, MAX_VEL);
-    vel.y = Min(vel.y, MAX_VEL);
-
-    pos += vel * (deltaTime / 1000.);
-=======
     vel *= Max(1. - DRAG_AMOUNT * deltaTime, 0.);
     vel.x = Min(vel.x, MAX_VEL);
     vel.y = Min(vel.y, MAX_VEL);
 
     pos += vel * deltaTime;
->>>>>>> VisualStudio
     vec2 wpos = GetWindowPos();
 
     // clamp to collided window border and bounce
     if (Collision coll = collider.CollideWithBorders(surface)) {
-<<<<<<< HEAD
-=======
         //PlaySingleSound(SOUND_BOUNCE);
 
->>>>>>> VisualStudio
         if (coll.left || coll.right) {
             pos.x = coll.left ? wpos.x : wpos.x + surface->GetWidth() - size.x; 
             vel.x *= -1;
@@ -62,11 +45,7 @@ void Ball::Update(float deltaTime) {
             vel.y *= -1;
         }
     }
-<<<<<<< HEAD
-    
-=======
    
->>>>>>> VisualStudio
     vec2 lpos = pos - wpos;
     sprite->DrawScaled(lpos.x, lpos.y, size.x, size.y, surface);
 }
@@ -82,11 +61,6 @@ Star::Star(Surface* s, vec2 p) {
 }
 
 void Star::Update(float deltaTime) {
-<<<<<<< HEAD
-    // pos += vel * (deltaTime / 1000.);
-
-=======
->>>>>>> VisualStudio
     if (!collider.IsOutsideSurface(surface)) {
         vec2 lpos = pos - GetWindowPos();
         starSprite.DrawScaled(lpos.x, lpos.y, size.x, size.y, surface);
