@@ -2,6 +2,11 @@
 
 This is my intake assignment for Creative Media & Game Technologies at Breda University.
 
+## NOTE
+
+> Due to difficulties with DLL binding sound does not currently work, nor the x86/Win32 version.
+> I've done all I could to fix this, but Windows seems to try to stop me every step of the way.
+
 ## Gameplay
 
 In *Whack 'a Window*, the goal is to collect as many stars as possible within 60 seconds by hitting them with a bouncing ball. The twist, however, is that the player has no actual control over the ball! Instead, the game window can be dragged around used to bounce the ball. The ball is confined by the game window's borders, but the stars are not. To find and gather them the player must drag the game window all over the monitor and bounce the ball in the right direction!
